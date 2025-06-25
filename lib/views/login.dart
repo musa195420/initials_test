@@ -1,108 +1,81 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/helper/routes.dart';
-import 'package:initial_test/providers/login_provider.dart';
-import 'package:initial_test/services/navigation_service.dart';
-import 'package:initial_test/states/login_state.dart';
-import 'package:initial_test/views/not_found_page.dart';
+import 'package:initial_test/view_models/login_view_model.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
+import 'package:provider/provider.dart';
 
-class LogIn extends ConsumerStatefulWidget {
+class LogIn extends StatefulWidget {
   const LogIn({super.key});
 
   @override
-  ConsumerState<LogIn> createState() => _LogInState();
+  State<LogIn> createState() => _LogInState();
 }
 
-class _LogInState extends ConsumerState<LogIn> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _emailCtl;
-  late final TextEditingController _passCtl;
-
-  @override
-  void initState() {
-    super.initState();
-    final state = ref.read(loginProvider);
-    _emailCtl = TextEditingController(text: state.email);
-    _passCtl = TextEditingController(text: state.password);
-  }
-
-  @override
-  void dispose() {
-    _emailCtl.dispose();
-    _passCtl.dispose();
-    super.dispose();
-  }
+class _LogInState extends State<LogIn> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+  bool hasNavigated = false;
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(loginProvider);
-    final actions = ref.read(loginProvider.notifier);
+    return ChangeNotifierProvider(
+      create: (_) => LogInViewModel(),
+      child: Consumer<LogInViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoggedIn && !hasNavigated) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              hasNavigated = true;
+              viewModel.gotoHome();
+            });
+          }
 
-    if (state.isLoggedIn) return const NotFoundPage();
+          final keyIcon = viewModel.obscureText
+              ? const Icon(Icons.key)
+              : const Icon(Icons.key_off_outlined);
 
-    final keyIcon = state.obscureText
-        ? const Icon(Icons.key)
-        : const Icon(Icons.key_off_outlined);
+          return Scaffold(
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                final double maxW = constraints.maxWidth;
+                final double maxH = constraints.maxHeight;
+                final double headerH = min(maxH * .35, 280);
+                final double logoW = min(maxW * .45, 160);
+                final double hPad = maxW < 500
+                    ? 16
+                    : maxW < 800
+                        ? 32
+                        : 64;
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double maxW = constraints.maxWidth;
-          final double maxH = constraints.maxHeight;
-
-          // Cap sizes so they don’t grow uncontrollably
-          final double headerH = min(maxH * .35, 280);
-          final double logoW = min(maxW * .45, 160);
-
-          // Horizontal padding scales a bit, but the real width is capped later.
-          final double hPad = maxW < 500
-              ? 16
-              : maxW < 800
-                  ? 32
-                  : 64;
-
-          return Stack(
-            children: [
-              _HeaderBackground(
-                height: headerH,
-                logoW: logoW,
-              ),
-              _WhiteBottomBox(
-                  offset: headerH - 20), // -20 to tuck under header curve
-              // ─────────── Main scrollable content ───────────
-              SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: hPad)
-                    .add(EdgeInsets.only(top: headerH - 60)),
-                child: Center(
-                  // <= This keeps everything phone-sized even on wide screens
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 440),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: headerH / 2,
+                return Stack(
+                  children: [
+                    _HeaderBackground(height: headerH, logoW: logoW),
+                    _WhiteBottomBox(offset: headerH - 20),
+                    SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: hPad)
+                          .add(EdgeInsets.only(top: headerH - 60)),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 440),
+                          child: Column(
+                            children: [
+                              SizedBox(height: headerH / 2),
+                              _FormCard(
+                                emailController: emailController,
+                                passController: passController,
+                                keyIcon: keyIcon,
+                                viewModel: viewModel,
+                              ),
+                              const SizedBox(height: 28),
+                              _SignUpLink(viewModel),
+                            ],
+                          ),
                         ),
-                        _FormCard(
-                          formKey: _formKey,
-                          emailCtl: _emailCtl,
-                          passCtl: _passCtl,
-                          keyIcon: keyIcon,
-                          state: state,
-                          actions: actions,
-                        ),
-                        const SizedBox(height: 28),
-                        _SignUpLink(),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ],
+                  ],
+                );
+              },
+            ),
           );
         },
       ),
@@ -196,22 +169,16 @@ class _Title extends StatelessWidget {
 
 class _FormCard extends StatelessWidget {
   const _FormCard({
-    required GlobalKey<FormState> formKey,
-    required TextEditingController emailCtl,
-    required TextEditingController passCtl,
+    required this.emailController,
+    required this.passController,
     required this.keyIcon,
-    required this.state,
-    required this.actions,
-  })  : _formKey = formKey,
-        _emailCtl = emailCtl,
-        _passCtl = passCtl;
+    required this.viewModel,
+  });
 
-  final GlobalKey<FormState> _formKey;
-  final TextEditingController _emailCtl;
-  final TextEditingController _passCtl;
+  final TextEditingController emailController;
+  final TextEditingController passController;
   final Icon keyIcon;
-  final LoginState state;
-  final LoginNotifier actions;
+  final LogInViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -221,63 +188,37 @@ class _FormCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // ────────── Email ──────────
-              TextFormField(
-                controller: _emailCtl,
-                onChanged: actions.setEmail,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Enter your e-mail' : null,
-                decoration: _inputDecoration(
-                  'Email',
-                  const Icon(Icons.email_outlined),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: emailController,
+              decoration: _inputDecoration(
+                'Email',
+                const Icon(Icons.email_outlined),
+              ),
+            ),
+            const SizedBox(height: 18),
+            TextFormField(
+              controller: passController,
+              obscureText: viewModel.obscureText,
+              decoration: _inputDecoration(
+                'Password',
+                GestureDetector(
+                  onTap: viewModel.togglePasswordVisibility,
+                  child: keyIcon,
                 ),
               ),
-              const SizedBox(height: 18),
-              // ───────── Password ────────
-              TextFormField(
-                controller: _passCtl,
-                onChanged: actions.setPassword,
-                obscureText: state.obscureText,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Enter your password' : null,
-                decoration: _inputDecoration(
-                  'Password',
-                  GestureDetector(
-                    onTap: actions.togglePasswordVisibility,
-                    child: keyIcon,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 26),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffff5722),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 3,
-                ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    await actions.userLogin(context);
-                  }
-                },
-                child: const Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Poppins1',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 26),
+            ElevatedButton(
+              onPressed: () async {
+                viewModel.setEmail(emailController.text.trim());
+                viewModel.setPassword(passController.text);
+                await viewModel.userLogin(context);
+              },
+              child: const Text('Login'),
+            ),
+          ],
         ),
       ),
     );
@@ -292,25 +233,17 @@ class _FormCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: Colors.black),
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.black, width: 2),
-      ),
     );
   }
 }
 
 class _SignUpLink extends StatelessWidget {
-  _SignUpLink();
-  final nav = locator<NavigationService>();
+  const _SignUpLink(this.vm);
+  final LogInViewModel vm;
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () => nav.goTo(Routes.signup),
+        onTap: vm.gotoSignup,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(

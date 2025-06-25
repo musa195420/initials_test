@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -10,9 +9,13 @@ import 'package:hive/hive.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/helper/provider.dart';
+import 'package:initial_test/models/hive_models/hive_user.dart';
 import 'package:initial_test/services/hive_service.dart';
+import 'package:initial_test/themes/themes.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:provider/provider.dart';
 
 void main() {
   runZonedGuarded(
@@ -41,7 +44,8 @@ Future configSettings() async {
     final appDocumentDirectory =
         await path_provider.getApplicationDocumentsDirectory();
     Hive.init("${appDocumentDirectory.path}/pet_adoption");
-    await locator<IHiveService<User>>().init();
+
+    await locator<IHiveService<HiveUser>>().init();
     //init methods of all like init language errors locator<NotificationServices>().requestNotificationPermissions();
   } catch (e) {
     debugPrint("Error => $e");
@@ -71,17 +75,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
+    return MultiProvider(
+      providers: ProviderInjector.providers,
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: Colors.black,
-            surface: Colors.white,
-          ),
-          useMaterial3: true,
-        ),
+        theme: theme,
       ),
     );
   }
