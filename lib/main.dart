@@ -1,12 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/services/hive_service.dart';
+
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 void main() {
   runZonedGuarded(
@@ -19,6 +25,7 @@ void main() {
       await LocatorInjector.setupLocator(); // 3️⃣
       registerLoader();
       await configSettings();
+      HttpOverrides.global = CustomHttpOverrides();
       runApp(const MyApp());
     },
     (Object error, StackTrace stack) {
@@ -31,6 +38,10 @@ Future configSettings() async {
   // Init Services
 
   try {
+    final appDocumentDirectory =
+        await path_provider.getApplicationDocumentsDirectory();
+    Hive.init("${appDocumentDirectory.path}/pet_adoption");
+    await locator<IHiveService<User>>().init();
     //init methods of all like init language errors locator<NotificationServices>().requestNotificationPermissions();
   } catch (e) {
     debugPrint("Error => $e");
@@ -73,5 +84,14 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CustomHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
