@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/views/login.dart';
 import 'package:initial_test/views/not_found_page.dart';
+import 'package:initial_test/views/signup.dart';
 import 'package:initial_test/views/startup.dart';
 
 final router = GoRouter(
@@ -17,6 +19,27 @@ final router = GoRouter(
         const StartupPage(),
         //   HealthInfoPage(info: info),
         AppTransition.fade,
+      ),
+    ),
+    GoRoute(
+      path: Routes.login,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const LogIn(),
+        AppTransition.slideFromBottom,
+      ),
+    ),
+    GoRoute(
+      path: Routes.signup,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const SignUp(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.notfound,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const NotFoundPage(),
+        AppTransition.slideFromRight,
       ),
     ),
   ],

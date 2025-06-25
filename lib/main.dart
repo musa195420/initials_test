@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/views/startup.dart';
 
 void main() {
   runZonedGuarded(

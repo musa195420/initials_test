@@ -1,15 +1,31 @@
+// lib/screens/logout_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:initial_test/providers/no_provider.dart';
 
-class NotFoundPage extends StatelessWidget {
+class NotFoundPage extends ConsumerWidget {
   const NotFoundPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SizedBox(
-        child: Column(
-          children: [Text("No Route Found For Requested")],
-        ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final logoutState = ref.watch(logoutProvider);
+    final logoutNotifier = ref.read(logoutProvider.notifier);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Logout'),
+      ),
+      body: Center(
+        child: logoutState.isLoading
+            ? const CircularProgressIndicator()
+            : ElevatedButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text('Logout'),
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12)),
+                onPressed: () => logoutNotifier.logout(),
+              ),
       ),
     );
   }

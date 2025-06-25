@@ -1,56 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:initial_test/states/sigup_state.dart';
+import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/helper/routes.dart';
+import 'package:initial_test/services/firebase_service.dart';
+import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/states/signup_state.dart';
 
 class SignUpNotifier extends StateNotifier<SignUpState> {
-  SignUpNotifier()
-      : super(SignUpState(name: '', email: '', password: '', repassword: '')) {
-    checkLoginStatus();
-  }
+  final _firebase = locator<IFirebaseService>();
+  final _nav = locator<NavigationService>();
+  SignUpNotifier() : super(const SignUpState());
 
-  void togglePasswordVisibility() {
-    state = state.copyWith(obscureText: !state.obscureText);
-  }
+  // ⚡ setters called by onChanged
+  void setName(String v) => state = state.copyWith(name: v);
+  void setEmail(String v) => state = state.copyWith(email: v);
+  void setPassword(String v) => state = state.copyWith(password: v);
+  void setRePassword(String v) => state = state.copyWith(repassword: v);
 
-  Future<void> checkLoginStatus() async {}
+  void togglePasswordVisibility() =>
+      state = state.copyWith(obscureText: !state.obscureText);
 
-  Future<void> registerUser(BuildContext context) async {
+  Future<void> registerUser(BuildContext ctx) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: state.email,
-        password: state.password,
-      );
+      var res =
+          await _firebase.signUp(email: state.email, password: state.password);
 
-      // Map<String, dynamic> userInfo = {
-      //   "Name": state.nameController.text.trim(),
-      //   "Email": state.emailController.text.trim(),
-      //   "Wallet": "0",
-      //   "Id": id,
-      // };
-
-      // await DataBaseMethods().addUserDetail(userInfo, id);
-      // await SharedPreferenceHelper().saveUserName(userInfo["Name"]);
-      // await SharedPreferenceHelper().saveUserEmail(userInfo["Email"]);
-      // await SharedPreferenceHelper().saveUserWallet("0");
-      // await SharedPreferenceHelper().saveUserId(id);
-      // await SharedPreferenceHelper().saveLoginKey("true");
-
-      state = state.copyWith(isLoggedIn: true);
-
-      if (context.mounted) {
-        //Goto Next Page Navigation Service
+      if (res is AuthSuccess<UserCredential>) {
+        final user = res.data.user!;
+        _nav.goTo(Routes.notfound);
+        debugPrint(user.displayName);
+      } else if (res is AuthFailure) {
+        // handle the error
+        //showError(res.message);
       }
     } on FirebaseAuthException catch (e) {
-      String msg = "Registration failed!";
-      if (e.code == 'weak-password') {
-        msg = "The provided password is too weak!";
-      } else if (e.code == 'email-already-in-use') {
-        msg = "An account with this email already exists!";
-      }
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      final msg = switch (e.code) {
+        'weak-password' => 'The provided password is too weak.',
+        'email-already-in-use' => 'This email is already registered.',
+        _ => 'Registration failed.',
+      };
+      if (ctx.mounted) {
+        ScaffoldMessenger.of(ctx).showSnackBar(
           SnackBar(content: Text(msg), backgroundColor: Colors.red),
         );
       }
@@ -58,6 +49,7 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
   }
 }
 
-final signupProvider = StateNotifierProvider<SignUpNotifier, SignUpState>(
-  (ref) => SignUpNotifier(),
-);
+final signupProvider =
+    StateNotifierProvider<SignUpNotifier, SignUpState>((ref) {
+  return SignUpNotifier();
+});
