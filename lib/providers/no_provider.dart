@@ -36,6 +36,10 @@ class LogoutNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  Future<void> gotoAqi() async {
+    _nav.goTo(Routes.aqi);
+  }
+
   Future<void> getUser() async {
     var userId = await _prefService.getString(PrefKey.userId);
 

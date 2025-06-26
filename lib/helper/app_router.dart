@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/views/aqi_screen.dart';
 import 'package:initial_test/views/login.dart';
 import 'package:initial_test/views/not_found_page.dart';
 import 'package:initial_test/views/signup.dart';
@@ -39,6 +40,13 @@ final router = GoRouter(
       path: Routes.notfound,
       pageBuilder: (_, __) => _buildPageWithTransition(
         const NotFoundPage(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.aqi,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const AqiScreen(),
         AppTransition.slideFromRight,
       ),
     ),
