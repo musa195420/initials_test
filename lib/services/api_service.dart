@@ -67,6 +67,7 @@ class ApiServiceImpl implements IApiService {
 
   static const _token = '4c161cc78151405d23e02d352f41b10bdf3df790';
   static const _baseUrl = 'https://api.waqi.info/feed';
+  @override
   Future<AqiData> fetchAqi(String city) async {
     final res = await http.get(Uri.parse('$_baseUrl/$city/?token=$_token'));
     if (res.statusCode == 200) {

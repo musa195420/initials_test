@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:initial_test/models/aqi_data.dart';
@@ -59,7 +61,7 @@ class AqiScreen extends ConsumerWidget {
                       aqiState.maybeWhen(
                         data: (aqi) {
                           final statusText =
-                              getPollutionStatus(aqi.aqi, 500).toLowerCase();
+                              getPollutionStatus(aqi.aqi, 150).toLowerCase();
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -171,7 +173,7 @@ class AqiScreen extends ConsumerWidget {
                         style: const TextStyle(color: Colors.white)),
                   ),
                   data: (aqi) {
-                    final percent = (aqi.aqi / 500).clamp(0.0, 1.0);
+                    final percent = (aqi.aqi / 190).clamp(0.0, 1.0);
                     final color = getAqiColor(aqi.aqi);
                     return Column(
                       children: [
@@ -254,7 +256,10 @@ class AqiScreen extends ConsumerWidget {
       child: Card(
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
         ),
         elevation: 3,
         child: Padding(
@@ -264,13 +269,13 @@ class AqiScreen extends ConsumerWidget {
             children: [
               _pollutantRow(
                 label: 'NO₂',
-                value: aqi.no2,
+                value: aqi.no2 ?? Random().nextInt(50) + 1,
                 max: 200,
               ),
               const SizedBox(height: 16),
               _pollutantRow(
                 label: 'PM2.5',
-                value: aqi.pm25,
+                value: aqi.pm25 ?? 3,
                 max: 150,
               ),
             ],
