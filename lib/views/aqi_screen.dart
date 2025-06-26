@@ -8,10 +8,10 @@ class AqiScreen extends ConsumerWidget {
   const AqiScreen({super.key});
 
   static Color getAqiColor(int aqi) {
-    if (aqi <= 50) return Colors.green;
+    if (aqi <= 50) return const Color.fromARGB(255, 6, 255, 14);
     if (aqi <= 100) return Colors.yellow;
     if (aqi <= 150) return Colors.orange;
-    if (aqi <= 200) return Colors.red;
+    if (aqi <= 200) return const Color.fromARGB(255, 241, 20, 4);
     return Colors.purple;
   }
 
@@ -181,7 +181,8 @@ class AqiScreen extends ConsumerWidget {
                           percent: percent,
                           animation: true,
                           animationDuration: 800,
-                          backgroundColor: Colors.blue.shade100,
+                          backgroundColor:
+                              const Color.fromARGB(255, 133, 193, 243),
                           progressColor: color,
                           circularStrokeCap: CircularStrokeCap.round,
                           center: Column(
