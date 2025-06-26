@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:initial_test/helper/stateful_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:initial_test/view_models/authentication_view_model.dart';
 
@@ -7,21 +8,17 @@ class StartupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthenticationViewModel>(
-      builder: (context, authVM, _) {
-        // Schedule navigation safely AFTER the build/layout phase.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (authVM.user != null) {
-            authVM.gotoHome(); // ✅ push home
-          } else {
-            authVM.gotoLogin(); // ✅ push login
-          }
-        });
+    AuthenticationViewModel viewModel =
+        context.watch<AuthenticationViewModel>();
 
-        return const Scaffold(
-          body: Center(child: Text('Project is starting, please wait…')),
-        );
+    return StatefulWrapper(
+      onInit: () {
+        viewModel.checkLogin();
       },
+      onDispose: () {},
+      child: const Scaffold(
+        body: Center(child: Text('Project is starting, please wait…')),
+      ),
     );
   }
 }

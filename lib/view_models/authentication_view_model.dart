@@ -21,6 +21,23 @@ class AuthenticationViewModel extends BaseViewModel {
       notifyListeners();
     });
   }
+  bool isloading = false;
+  Future<void> checkLogin() async {
+    isloading = true;
+    try {
+      var res = FirebaseAuth.instance.currentUser;
+      if (res == null) {
+        gotoHome();
+      } else {
+        gotoLogin();
+      }
+    } catch (e, s) {
+      debugPrint("Error ${e.toString()} Stack ${s.toString()}");
+    } finally {
+      isloading = false;
+      notifyListeners();
+    }
+  }
 
   // Helper function to sign out
   Future<void> signOut() async {
@@ -37,17 +54,11 @@ class AuthenticationViewModel extends BaseViewModel {
     }
   }
 
-  bool _hasNavigated = false;
-
   void gotoHome() {
-    if (_hasNavigated) return;
-    _hasNavigated = true;
     _nav.goTo(Routes.notfound, replace: true);
   }
 
   void gotoLogin() {
-    if (_hasNavigated) return;
-    _hasNavigated = true;
     _nav.goTo(Routes.login, replace: true);
   }
 
