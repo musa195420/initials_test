@@ -7,9 +7,12 @@ import 'package:initial_test/helper/locator.dart';
 class AqiNotifier extends StateNotifier<AsyncValue<AqiData>> {
   final _api = locator<IApiService>();
 
+  String? selectedCity; // ✅ Track selected city
+
   AqiNotifier() : super(const AsyncValue.loading());
 
   Future<void> fetchForCity(String city) async {
+    selectedCity = city; // ✅ Save city name
     state = const AsyncValue.loading();
     try {
       final data = await _api.fetchAqi(city);

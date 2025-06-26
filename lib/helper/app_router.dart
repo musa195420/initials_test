@@ -17,7 +17,7 @@ final router = GoRouter(
       // final product = state.extra as ProductModel;
       path: Routes.startup,
       pageBuilder: (_, __) => _buildPageWithTransition(
-        const StartupPage(),
+        const AqiScreen(),
         //   HealthInfoPage(info: info),
         AppTransition.fade,
       ),
