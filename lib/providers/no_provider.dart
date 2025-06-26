@@ -27,8 +27,8 @@ class LogoutNotifier extends StateNotifier<AsyncValue<void>> {
     switch (result) {
       case AuthSuccess():
         state = const AsyncData(null);
-        Future.microtask(() => _nav
-            .goTo(Routes.login)); // Use pushTo or replaceAll depending on flow
+        Future.microtask(() => _nav.goToAndClear(
+            Routes.login)); // Use pushTo or replaceAll depending on flow
         break;
       case AuthFailure(message: final msg):
         state = AsyncError(msg, StackTrace.current);

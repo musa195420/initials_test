@@ -46,7 +46,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (res.user != null) {
         _prefService.setString(PrefKey.userId, res.user!.uid);
         state = state.copyWith(isLoggedIn: true);
-        _nav.goTo(Routes.notfound);
+        _nav.goToAndClear(Routes.notfound);
         _showPopup(ctx, 'Welcome back!', 15);
       }
 
