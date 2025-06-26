@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:initial_test/models/hive_models/hive_user.dart';
 import 'package:initial_test/repos/user_repo.dart';
 import 'package:initial_test/services/api_service.dart';
+import 'package:initial_test/services/dialog_service.dart';
 import 'package:initial_test/services/firebase_database.dart';
 import 'package:initial_test/services/firebase_service.dart';
 import 'package:initial_test/services/hive_service.dart';
@@ -21,6 +22,8 @@ class LocatorInjector {
 
       locator.registerLazySingleton<IFirebaseDatabase>(
           () => FirebaseDatabaseImpl());
+
+      locator.registerLazySingleton<IDialogService>(() => DialogService());
 
       locator.registerLazySingleton<IApiService>(() => ApiServiceImpl());
 

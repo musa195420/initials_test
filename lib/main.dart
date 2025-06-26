@@ -10,6 +10,7 @@ import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/models/hive_models/hive_user.dart';
 import 'package:initial_test/services/hive_service.dart';
+import 'package:initial_test/services/pref_service.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
 
@@ -37,6 +38,8 @@ Future configSettings() async {
   // Init Services
 
   try {
+    await locator<PrefService>().init();
+
     final appDocumentDirectory =
         await path_provider.getApplicationDocumentsDirectory();
     Hive.init("${appDocumentDirectory.path}/pet_adoption");

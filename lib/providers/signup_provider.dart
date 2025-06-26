@@ -7,10 +7,12 @@ import 'package:initial_test/models/user_model.dart';
 import 'package:initial_test/services/api_service.dart';
 import 'package:initial_test/services/firebase_service.dart';
 import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/states/signup_state.dart';
 
 class SignUpNotifier extends StateNotifier<SignUpState> {
   final _apiService = locator<IApiService>();
+  final PrefService _prefService = locator<PrefService>();
   final _firebase = locator<IFirebaseService>();
   final _nav = locator<NavigationService>();
   SignUpNotifier() : super(const SignUpState());
@@ -36,6 +38,8 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
             name: user.displayName ?? "",
             email: user.email ?? "",
             wallet: 0));
+
+        _prefService.setString(PrefKey.userId, user.uid);
         _nav.goTo(Routes.notfound);
         debugPrint(user.displayName);
       } else if (res is AuthFailure) {

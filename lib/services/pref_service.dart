@@ -60,11 +60,6 @@ class PrefService {
 
 enum PrefKey {
   isLoggedIn,
-  isSetupComplete,
-  token,
-  refreshToken,
-  tokenExpiresIn,
-  tokenStartTime,
-  isProduction,
-  userEmail
+
+  userId
 }

@@ -2,13 +2,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:initial_test/helper/routes.dart';
+import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/states/login_state.dart';
+
+import '../helper/locator.dart';
+import '../services/pref_service.dart';
 
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   return LoginNotifier();
 });
 
 class LoginNotifier extends StateNotifier<LoginState> {
+  final _nav = locator<NavigationService>();
+  final PrefService _prefService = locator<PrefService>();
   LoginNotifier() : super(const LoginState()) {
     _checkLoginStatus();
   }
@@ -28,6 +35,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     // final isLoggedInStr = await SharedPreferenceHelper().getLoginKey();
     // state = state.copyWith(isLoggedIn: isLoggedInStr == 'true');
   }
+  void setLoggedOut() => state = state.copyWith(isLoggedIn: false);
 
   Future<void> userLogin(BuildContext ctx) async {
     try {
@@ -36,7 +44,9 @@ class LoginNotifier extends StateNotifier<LoginState> {
         password: state.password,
       );
       if (res.user != null) {
+        _prefService.setString(PrefKey.userId, res.user!.uid);
         state = state.copyWith(isLoggedIn: true);
+        _nav.goTo(Routes.notfound);
         _showPopup(ctx, 'Welcome back!', 15);
       }
 

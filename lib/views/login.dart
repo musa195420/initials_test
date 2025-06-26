@@ -8,7 +8,6 @@ import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/providers/login_provider.dart';
 import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/states/login_state.dart';
-import 'package:initial_test/views/not_found_page.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
 
 class LogIn extends ConsumerStatefulWidget {
@@ -42,8 +41,6 @@ class _LogInState extends ConsumerState<LogIn> {
   Widget build(BuildContext context) {
     final state = ref.watch(loginProvider);
     final actions = ref.read(loginProvider.notifier);
-
-    if (state.isLoggedIn) return const NotFoundPage();
 
     final keyIcon = state.obscureText
         ? const Icon(Icons.key)

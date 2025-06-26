@@ -18,13 +18,26 @@ class NotFoundPage extends ConsumerWidget {
       body: Center(
         child: logoutState.isLoading
             ? const CircularProgressIndicator()
-            : ElevatedButton.icon(
-                icon: const Icon(Icons.logout),
-                label: const Text('Logout'),
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12)),
-                onPressed: () => logoutNotifier.logout(),
+            : Column(
+                spacing: 40,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Logout'),
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12)),
+                    onPressed: () => logoutNotifier.logout(),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.person),
+                    label: const Text('Get User'),
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12)),
+                    onPressed: () => logoutNotifier.getUser(),
+                  ),
+                ],
               ),
       ),
     );
