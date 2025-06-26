@@ -146,6 +146,7 @@ class AqiScreen extends ConsumerWidget {
                             const Text(
                               "Fetching air quality...",
                               style: TextStyle(
+                                fontFamily: 'PlayfairDisplay',
                                 fontSize: 14,
                                 color: Colors.white70,
                               ),
@@ -193,6 +194,7 @@ class AqiScreen extends ConsumerWidget {
                               Text(
                                 '${aqi.aqi}',
                                 style: const TextStyle(
+                                  fontFamily: 'PlayfairDisplay',
                                   fontSize: 48,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -201,6 +203,7 @@ class AqiScreen extends ConsumerWidget {
                               const Text(
                                 'AQI',
                                 style: TextStyle(
+                                  fontFamily: 'PlayfairDisplay',
                                   fontSize: 18,
                                   color: Colors.white70,
                                 ),
@@ -235,7 +238,7 @@ class AqiScreen extends ConsumerWidget {
             /// ⬇️ Bottom Card
             Align(
               alignment: Alignment.bottomCenter,
-              child: Container(
+              child: SizedBox(
                 height: screenHeight * 0.35,
                 width: double.infinity,
                 child: aqiState.maybeWhen(
@@ -303,22 +306,33 @@ class AqiScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     '      (µg/m³)',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(
+                        fontFamily: 'PlayfairDisplay',
+                        color: Colors.grey,
+                        fontSize: 12),
                   ),
                   Text(
                     label,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontFamily: 'PlayfairDisplay',
+                        fontWeight: FontWeight.bold),
                   ),
                   Text(
                     status,
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(
+                        fontFamily: 'PlayfairDisplay',
+                        color: Colors.grey,
+                        fontSize: 12),
                   ),
                 ],
               ),
             ),
             Text(
               value.toString(),
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontFamily: 'PlayfairDisplay',
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
