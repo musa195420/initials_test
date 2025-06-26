@@ -30,7 +30,7 @@ class _StartupPageState extends ConsumerState<StartupPage> {
           // Navigate **after** the current frame so it won’t clash with build.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (user != null) {
-              _nav.goTo(Routes.notfound); // TODO: replace with real home
+              _nav.goTo(Routes.notfound);
             } else {
               _nav.goTo(Routes.login);
             }

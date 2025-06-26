@@ -10,6 +10,7 @@ import 'package:hive/hive.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/models/hive_models/hive_user.dart';
 import 'package:initial_test/services/hive_service.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -41,7 +42,7 @@ Future configSettings() async {
     final appDocumentDirectory =
         await path_provider.getApplicationDocumentsDirectory();
     Hive.init("${appDocumentDirectory.path}/pet_adoption");
-    await locator<IHiveService<User>>().init();
+    await locator<IHiveService<HiveUser>>().init();
     //init methods of all like init language errors locator<NotificationServices>().requestNotificationPermissions();
   } catch (e) {
     debugPrint("Error => $e");
