@@ -44,19 +44,24 @@ class AqiScreen extends ConsumerWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.arrow_back, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: aqiState.maybeWhen(
+                child: SizedBox(
+                  height: 80,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Back Icon aligned to the left
+                      const Positioned(
+                        left: 0,
+                        child: Icon(Icons.arrow_back, color: Colors.white),
+                      ),
+
+                      // Centered City + Status Text
+                      aqiState.maybeWhen(
                         data: (aqi) {
                           final statusText =
                               getPollutionStatus(aqi.aqi, 500).toLowerCase();
                           return Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               GestureDetector(
                                 onTapDown: (details) async {
@@ -86,6 +91,7 @@ class AqiScreen extends ConsumerWidget {
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -95,12 +101,13 @@ class AqiScreen extends ConsumerWidget {
                                   fontSize: 14,
                                   color: Colors.white70,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           );
                         },
                         orElse: () => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             GestureDetector(
                               onTapDown: (details) async {
@@ -130,6 +137,7 @@ class AqiScreen extends ConsumerWidget {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -139,12 +147,13 @@ class AqiScreen extends ConsumerWidget {
                                 fontSize: 14,
                                 color: Colors.white70,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
