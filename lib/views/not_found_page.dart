@@ -27,7 +27,7 @@ class NotFoundPage extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () => logoutNotifier.logout(),
+                    onPressed: () {},
                   ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.person),
@@ -35,7 +35,7 @@ class NotFoundPage extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () => logoutNotifier.getUser(),
+                    onPressed: () {},
                   ),
                 ],
               ),

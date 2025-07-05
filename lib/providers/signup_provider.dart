@@ -5,7 +5,6 @@ import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/models/user_model.dart';
 import 'package:initial_test/services/api_service.dart';
-import 'package:initial_test/services/firebase_service.dart';
 import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/states/signup_state.dart';
@@ -13,7 +12,6 @@ import 'package:initial_test/states/signup_state.dart';
 class SignUpNotifier extends StateNotifier<SignUpState> {
   final _apiService = locator<IApiService>();
   final PrefService _prefService = locator<PrefService>();
-  final _firebase = locator<IFirebaseService>();
   final _nav = locator<NavigationService>();
   SignUpNotifier() : super(const SignUpState());
 
@@ -27,36 +25,8 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
       state = state.copyWith(obscureText: !state.obscureText);
 
   Future<void> registerUser(BuildContext ctx) async {
-    try {
-      var res =
-          await _firebase.signUp(email: state.email, password: state.password);
-
-      if (res is AuthSuccess<UserCredential>) {
-        final user = res.data.user!;
-        _apiService.addUser(UserModel(
-            id: user.uid,
-            name: user.displayName ?? "",
-            email: user.email ?? "",
-            wallet: 0));
-
-        _prefService.setString(PrefKey.userId, user.uid);
-        _nav.goTo(Routes.notfound);
-        debugPrint(user.displayName);
-      } else if (res is AuthFailure) {
-        // handle the error
-        //showError(res.message);
-      }
-    } on FirebaseAuthException catch (e) {
-      final msg = switch (e.code) {
-        'weak-password' => 'The provided password is too weak.',
-        'email-already-in-use' => 'This email is already registered.',
-        _ => 'Registration failed.',
-      };
-      if (ctx.mounted) {
-        ScaffoldMessenger.of(ctx).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: Colors.red),
-        );
-      }
+    try {} catch (e, s) {
+      debugPrint("Error ${e.toString()} Stack ${s.toString()}");
     }
   }
 }

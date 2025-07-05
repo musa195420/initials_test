@@ -58,8 +58,4 @@ class PrefService {
   }
 }
 
-enum PrefKey {
-  isLoggedIn,
-
-  userId
-}
+enum PrefKey { isLoggedIn, token, userId }
