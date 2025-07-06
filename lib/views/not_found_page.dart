@@ -27,15 +27,35 @@ class NotFoundPage extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () {},
+                    onPressed: () {
+                      logoutNotifier.logout();
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   ElevatedButton.icon(
-                    icon: const Icon(Icons.person),
-                    label: const Text('Get User'),
+                    icon: const Icon(Icons.car_crash),
+                    label: const Text('Goto Pickup Ride'),
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () {},
+                    onPressed: () {
+                      logoutNotifier.gotoHome();
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.history),
+                    label: const Text('Your Rides'),
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12)),
+                    onPressed: () {
+                      logoutNotifier.gotoHome();
+                    },
                   ),
                 ],
               ),

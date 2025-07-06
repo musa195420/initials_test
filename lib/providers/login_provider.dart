@@ -1,82 +1,74 @@
-// ignore_for_file: use_build_context_synchronously
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:initial_test/helper/error_handler.dart';
+import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/helper/routes.dart';
+import 'package:initial_test/models/hive_models/user_profile.dart';
+import 'package:initial_test/models/request_model/login_request.dart';
+import 'package:initial_test/models/response_models/refresh_response.dart';
+import 'package:initial_test/services/api_service.dart';
+import 'package:initial_test/services/dialog_service.dart';
+import 'package:initial_test/services/global_service.dart';
+import 'package:initial_test/services/hive_service.dart';
 import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/states/login_state.dart';
 
-import '../helper/locator.dart';
-import '../services/pref_service.dart';
-
-final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
-  return LoginNotifier();
-});
+/// ───────── Provider that the UI imports ─────────
+final loginProvider =
+    StateNotifierProvider<LoginNotifier, LoginState>((ref) => LoginNotifier());
 
 class LoginNotifier extends StateNotifier<LoginState> {
+  LoginNotifier() : super(const LoginState());
+
+  // ───── dependencies ─────
+  final _api = locator<IApiService>();
+  final _dialog = locator<IDialogService>();
   final _nav = locator<NavigationService>();
-  final PrefService _prefService = locator<PrefService>();
-  LoginNotifier() : super(const LoginState()) {
-    _checkLoginStatus();
-  }
+  final _prefs = locator<PrefService>();
+  final _hive = locator<IHiveService<UserProfile>>();
+  final _glob = locator<GlobalService>();
 
-  /* ─────────────────────── UI setters ─────────────────────── */
-
-  void setEmail(String v) => state = state.copyWith(email: v);
-  void setPassword(String v) => state = state.copyWith(password: v);
-
+  // ───── setters the UI uses ─────
+  void setEmail(String v) =>
+      state = state.copyWith(email: v.trim().toLowerCase());
+  void setPassword(String v) => state = state.copyWith(password: v.trim());
   void togglePasswordVisibility() =>
       state = state.copyWith(obscureText: !state.obscureText);
 
-  /* ───────────────────  auth helpers ──────────────────── */
-
-  Future<void> _checkLoginStatus() async {
-    // Example:
-    // final isLoggedInStr = await SharedPreferenceHelper().getLoginKey();
-    // state = state.copyWith(isLoggedIn: isLoggedInStr == 'true');
-  }
-  void setLoggedOut() => state = state.copyWith(isLoggedIn: false);
-
-  Future<void> userLogin(BuildContext ctx) async {
+  // ───── login action ─────
+  Future<bool> userLogin() async {
     try {
-      var res = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: state.email.trim(),
-        password: state.password,
+      final res = await _api.login(
+        LoginRequest(email: state.email, password: state.password),
       );
-      if (res.user != null) {
-        _prefService.setString(PrefKey.userId, res.user!.uid);
-        state = state.copyWith(isLoggedIn: true);
-        _nav.goToAndClear(Routes.notfound);
-        _showPopup(ctx, 'Welcome back!', 15);
+
+      if (res.errorCode != 'PA0004') {
+        _dialog.showApiError(res.data);
+        return false;
       }
 
-      // state = state.copyWith(isLoggedIn: true);  // optionally update state
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-credential' || e.code == 'user-not-found') {
-        _showPopup(ctx, 'No user registered for that e-mail address.', 12);
+      // success ⇒ store tokens
+      final data = res.data as RefreshTokenResponse;
+      await _prefs.setString(PrefKey.token, data.accessToken ?? '');
+      await _prefs.setString(PrefKey.refreshToken, data.refreshToken ?? '');
+
+      // fetch user profile
+      final profRes =
+          await _api.getUserProfileByEmail(UserProfile(email: state.email));
+      if (profRes.errorCode == 'PA0004') {
+        _glob.setuser(profRes.data as UserProfile);
+        await _hive.deleteAllAndAdd(profRes.data as UserProfile);
+        _nav.goTo(Routes.notfound);
+        return true;
       } else {
-        _showPopup(ctx, 'Login failed. Please try again.', 12);
+        _dialog.showApiError(profRes.data);
+        return false;
       }
-    } catch (e) {
-      debugPrint('Login error: $e');
-      _showPopup(ctx, 'An unexpected error occurred.', 12);
+    } catch (e, st) {
+      printError(
+          error: e.toString(), stack: st.toString(), tag: 'login_provider');
+      _dialog.showApiError('Unexpected error: $e');
+      return false;
     }
-  }
-
-  /* ──────────────────── misc ───────────────────── */
-
-  void _showPopup(BuildContext context, String text, double size) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: const Color(0xFFE50914),
-        content: Row(
-          children: [
-            const Icon(Icons.warning, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(text, style: TextStyle(fontSize: size, color: Colors.white)),
-          ],
-        ),
-      ),
-    );
   }
 }

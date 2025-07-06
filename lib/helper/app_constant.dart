@@ -2,4 +2,4 @@
 
 String constant = "";
 bool isProduction = false;
-String server_url = "http://localhost:3020";
+String server_url = "https://d14e-103-198-154-144.ngrok-free.app";

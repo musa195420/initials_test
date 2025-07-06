@@ -1,56 +1,34 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/helper/routes.dart';
-import 'package:initial_test/providers/auth_provider.dart';
+import 'package:initial_test/providers/startup_provider.dart';
 import 'package:initial_test/services/navigation_service.dart';
 
-class StartupPage extends ConsumerStatefulWidget {
+class StartupPage extends ConsumerWidget {
   const StartupPage({super.key});
 
   @override
-  ConsumerState<StartupPage> createState() => _StartupPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nav = locator<NavigationService>();
+    final authAsync = ref.watch(isSignedInProvider);
 
-class _StartupPageState extends ConsumerState<StartupPage> {
-  late final NavigationService _nav;
-
-  @override
-  void initState() {
-    super.initState();
-    _nav = locator<NavigationService>();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen<AsyncValue<User?>>(authStateChangesProvider, (prev, next) {
-      next.when(
-        data: (user) {
-          // Navigate **after** the current frame so it won’t clash with build.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (user != null) {
-              _nav.goTo(Routes.notfound);
-            } else {
-              _nav.goTo(Routes.login);
-            }
-          });
-        },
-        loading: () {
-          return CircularProgressIndicator();
-        }, // show splash, do nothing
-        error: (err, st) {
-          return Column(
-            children: [
-              Text("Error ${err.toString()}, Stack ${st.toString()}"),
-            ],
-          );
-        },
-      );
-    });
-
-    return const Scaffold(
-      body: Center(child: Text('Project is starting, please wait…')),
+    return authAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, st) => Scaffold(
+        body: Center(child: Text('Error: $err\n\n$st')),
+      ),
+      data: (signedIn) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          nav.goTo(signedIn ? Routes.notfound : Routes.login);
+        });
+        // Invisible placeholder while nav happens
+        return const Scaffold(
+          body: Center(child: Text('Project is starting, please wait…')),
+        );
+      },
     );
   }
 }

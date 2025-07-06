@@ -1,41 +1,50 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../hive_user.dart';
+part of '../user_profile.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class HiveUserAdapter extends TypeAdapter<HiveUser> {
+class UserProfileAdapter extends TypeAdapter<UserProfile> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  HiveUser read(BinaryReader reader) {
+  UserProfile read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return HiveUser(
-      userId: fields[0] as String,
+    return UserProfile(
+      userId: fields[0] as String?,
       email: fields[1] as String?,
-      phoneNumber: fields[2] as String?,
-      password: fields[3] as String?,
+      password: fields[2] as String?,
+      fullName: fields[3] as String?,
+      phone: fields[4] as String?,
+      roleId: fields[5] as int?,
+      profileImage: fields[6] as String?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, HiveUser obj) {
+  void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
       ..write(obj.email)
       ..writeByte(2)
-      ..write(obj.phoneNumber)
+      ..write(obj.password)
       ..writeByte(3)
-      ..write(obj.password);
+      ..write(obj.fullName)
+      ..writeByte(4)
+      ..write(obj.phone)
+      ..writeByte(5)
+      ..write(obj.roleId)
+      ..writeByte(6)
+      ..write(obj.profileImage);
   }
 
   @override
@@ -44,7 +53,7 @@ class HiveUserAdapter extends TypeAdapter<HiveUser> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HiveUserAdapter &&
+      other is UserProfileAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
