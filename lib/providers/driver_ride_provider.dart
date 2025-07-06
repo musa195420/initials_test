@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:initial_test/helper/app_constant.dart';
-import 'package:initial_test/models/request_model/ride_model.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/models/hive_models/user_profile.dart';
+import 'package:initial_test/models/request_model/ride_model.dart';
+import 'package:initial_test/services/hive_service.dart';
+import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/services/pref_service.dart';
 
 import '../states/driver_ride_state.dart';
 import '../helper/locator.dart';
@@ -20,10 +24,15 @@ class DriverRideNotifier extends StateNotifier<DriverRideState> {
   final _dlg = locator<IDialogService>();
   final _glob = locator<GlobalService>();
 
-  Future<void> getRides() async {
+  final _nav = locator<NavigationService>();
+  final _prefs = locator<PrefService>();
+  final _hive = locator<IHiveService<UserProfile>>();
+  /*────────────────────────── fetching ──────────────────────────*/
+
+  Future<void> _getRequestedRides() async {
     state = state.copyWith(loading: true);
     try {
-      final res = await _api.getrides(); // get all requested rides
+      final res = await _api.getrides(); // all "requested"
       if (res.errorCode == 'PA0004') {
         final rides = (res.data as List)
             .map((e) => RideModel.fromJson(e as Map<String, dynamic>))
@@ -39,7 +48,7 @@ class DriverRideNotifier extends StateNotifier<DriverRideState> {
     }
   }
 
-  Future<void> getDriverRides() async {
+  Future<void> _getMyRides() async {
     state = state.copyWith(loading: true);
     try {
       final user = _glob.getuser();
@@ -61,7 +70,34 @@ class DriverRideNotifier extends StateNotifier<DriverRideState> {
     }
   }
 
-  void setFilter(RideStatus s) => state = state.copyWith(selectedStatus: s);
+  void logout() async {
+    await _prefs.setString(PrefKey.token, '');
+    await _prefs.setString(PrefKey.refreshToken, '');
+
+    // fetch user profile
+
+    await _hive.deleteAll();
+
+    _nav.goTo(Routes.login);
+  }
+
+  /// called from UI (tab switch / pull‑to‑refresh)
+  Future<void> refreshCurrent() async {
+    switch (state.selectedStatus) {
+      case RideStatus.requested:
+        await _getRequestedRides();
+        break;
+      default:
+        await _getMyRides();
+    }
+  }
+
+  Future<void> setFilter(RideStatus s) async {
+    state = state.copyWith(selectedStatus: s);
+    await refreshCurrent();
+  }
+
+  /*─────────────────────── ride mutations ───────────────────────*/
 
   Future<void> acceptRide(RideModel ride) async {
     final user = _glob.getuser();
@@ -71,38 +107,22 @@ class DriverRideNotifier extends StateNotifier<DriverRideState> {
       status: RideStatus.accepted.label,
       driverId: user.userId,
     );
-
     await _updateRide(updated);
   }
 
-  Future<void> startRide(RideModel ride) async {
-    final updated = ride.copyWith(status: RideStatus.inProgress.label);
-    await _updateRide(updated);
-  }
+  Future<void> completeRide(RideModel ride) async =>
+      _updateRide(ride.copyWith(status: RideStatus.completed.label));
 
-  Future<void> completeRide(RideModel ride) async {
-    final updated = ride.copyWith(status: RideStatus.completed.label);
-    await _updateRide(updated);
-  }
-
-  Future<void> cancelRide(RideModel ride) async {
-    final updated = ride.copyWith(status: RideStatus.cancelled.label);
-    await _updateRide(updated);
-  }
+  Future<void> cancelRide(RideModel ride) async =>
+      _updateRide(ride.copyWith(status: RideStatus.cancelled.label));
 
   Future<void> _updateRide(RideModel ride) async {
     state = state.copyWith(loading: true);
     try {
       final res = await _api.updateride(ride);
       if (res.errorCode == 'PA0004') {
-        _dlg.showSuccess(text: "Ride updated successfully");
-
-        // refresh local
-        final idx = state.rides.indexWhere((e) => e.id == ride.id);
-        if (idx != -1) {
-          final newRides = [...state.rides]..[idx] = ride;
-          state = state.copyWith(rides: newRides);
-        }
+        _dlg.showSuccess(text: 'Ride updated successfully');
+        await refreshCurrent(); // reload list after server change
       } else {
         _dlg.showApiError(res.data);
       }

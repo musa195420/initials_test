@@ -40,6 +40,10 @@ class DriverNotifier extends StateNotifier<DriverState> {
     state = state.copyWith(isLoading: false);
   }
 
+  void gotoVehcile() {
+    _nav.goTo(Routes.vehicle);
+  }
+
   Future<void> addDriver(String userId) async {
     try {
       state = state.copyWith(isLoading: true);

@@ -44,6 +44,25 @@ class RideNotifier extends StateNotifier<RideState> {
     }
   }
 
+  Future<void> getAllRides() async {
+    state = state.copyWith(loading: true);
+    try {
+      final res = await _api.getrides();
+      if (res.errorCode == 'PA0004') {
+        final rides = (res.data as List)
+            .map((e) => RideModel.fromJson(e as Map<String, dynamic>))
+            .toList(growable: false);
+        state = state.copyWith(rides: rides);
+      } else {
+        _dlg.showApiError(res.data);
+      }
+    } catch (e) {
+      _dlg.showApiError('Unexpected error: $e');
+    } finally {
+      state = state.copyWith(loading: false);
+    }
+  }
+
   /// Change the status filter
   void setFilter(RideStatus s) => state = state.copyWith(selectedStatus: s);
 

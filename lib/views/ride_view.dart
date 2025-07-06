@@ -39,7 +39,6 @@ class _RideViewState extends ConsumerState<RideView> {
       ),
       body: Column(
         children: [
-          /* ───────── FILTER BAR ───────── */
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -70,18 +69,18 @@ class _RideViewState extends ConsumerState<RideView> {
             ),
           ),
           const Divider(height: 1, thickness: 1),
-
-          /* ───────── RIDE LIST ───────── */
           Expanded(
             child: state.loading
                 ? const Center(child: CircularProgressIndicator())
                 : shown.isEmpty
                     ? Center(
-                        child: Text('No ${state.selectedStatus.pretty} rides',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(color: Colors.grey[700])),
+                        child: Text(
+                          'No ${state.selectedStatus.pretty} rides',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(color: Colors.grey[700]),
+                        ),
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.all(12),
@@ -89,7 +88,6 @@ class _RideViewState extends ConsumerState<RideView> {
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (_, i) {
                           final r = shown[i];
-
                           return Card(
                             elevation: 3,
                             shadowColor: Colors.orange.shade100,
@@ -98,25 +96,54 @@ class _RideViewState extends ConsumerState<RideView> {
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              leading: const Icon(Icons.local_taxi,
-                                  color: Colors.orange),
-                              title: Text('${r.pickupText} → ${r.dropText}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600)),
-                              subtitle: Text(
-                                'Fare: PKR ${r.fareEstimate?.toStringAsFixed(0) ?? '--'}',
-                                style: TextStyle(color: Colors.grey.shade700),
+                                  vertical: 10, horizontal: 16),
+                              leading: Icon(
+                                _getRideIcon(r.rideType),
+                                size: 30,
+                                color: Colors.orange,
                               ),
-                              trailing: Text(
-                                r.status.replaceAll('_', ' '),
-                                style: TextStyle(
-                                  fontSize: 12,
+                              title: Text(
+                                r.rideType.toUpperCase(),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade800,
+                                  fontSize: 16,
                                 ),
                               ),
-                              // ────── NEW: tap to cancel if requested ──────
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Fare: PKR ${r.fareEstimate?.toStringAsFixed(0) ?? '--'}',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Requested: ${r.requestedAt}',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(r.status),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  r.status.replaceAll('_', ' ').toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                               onTap: r.status == RideStatus.requested.label
                                   ? () async {
                                       final ok = await showDialog<bool>(
@@ -127,19 +154,19 @@ class _RideViewState extends ConsumerState<RideView> {
                                                   'Do you really want to cancel this ride?'),
                                               actions: [
                                                 TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(
-                                                            ctx, false),
-                                                    child: const Text('No')),
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, false),
+                                                  child: const Text('No'),
+                                                ),
                                                 ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                Colors.orange),
-                                                    onPressed: () =>
-                                                        Navigator.pop(
-                                                            ctx, true),
-                                                    child: const Text('Yes')),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.orange),
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, true),
+                                                  child: const Text('Yes'),
+                                                ),
                                               ],
                                             ),
                                           ) ??
@@ -164,5 +191,35 @@ class _RideViewState extends ConsumerState<RideView> {
         child: const Icon(Icons.refresh),
       ),
     );
+  }
+
+  IconData _getRideIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'bike':
+        return Icons.pedal_bike;
+      case 'car':
+        return Icons.directions_car;
+      case 'rickshaw':
+        return Icons.electric_rickshaw;
+      default:
+        return Icons.local_taxi;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'requested':
+        return Colors.orange;
+      case 'accepted':
+        return Colors.blue;
+      case 'in_progress':
+        return Colors.purple;
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }

@@ -1,9 +1,7 @@
-// lib/ui/driver/add_vehicle.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:initial_test/providers/vehicle_provider.dart';
-import 'package:initial_test/widget_support/text_styles.dart';
 
 class AddVehiclePage extends ConsumerStatefulWidget {
   const AddVehiclePage({super.key});
@@ -15,11 +13,11 @@ class AddVehiclePage extends ConsumerStatefulWidget {
 class _AddVehiclePageState extends ConsumerState<AddVehiclePage> {
   final _formKey = GlobalKey<FormState>();
 
-  late final _typeCtl = TextEditingController();
-  late final _makeCtl = TextEditingController();
-  late final _modelCtl = TextEditingController();
-  late final _variantCtl = TextEditingController();
-  late final _plateCtl = TextEditingController();
+  final _typeCtl = TextEditingController();
+  final _makeCtl = TextEditingController();
+  final _modelCtl = TextEditingController();
+  final _variantCtl = TextEditingController();
+  final _plateCtl = TextEditingController();
 
   @override
   void dispose() {
@@ -33,31 +31,30 @@ class _AddVehiclePageState extends ConsumerState<AddVehiclePage> {
 
   InputDecoration _dec(String hint, IconData icon) => InputDecoration(
         hintText: hint,
-        hintStyle: SemiboldTextFieldStyle(),
-        prefixIcon: Icon(icon),
+        hintStyle: const TextStyle(
+          fontFamily: 'Poppins1',
+          fontWeight: FontWeight.w500,
+          color: Colors.black54,
+        ),
+        prefixIcon: Icon(icon, color: Colors.orange),
+        filled: true,
+        fillColor: Colors.grey[100],
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       );
 
   @override
   Widget build(BuildContext context) {
-    final s = ref.watch(vehicleProvider);
-    final a = ref.read(vehicleProvider.notifier);
+    final state = ref.watch(vehicleProvider);
+    final actions = ref.read(vehicleProvider.notifier);
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: LayoutBuilder(builder: (context, c) {
         final maxW = c.maxWidth, maxH = c.maxHeight;
-        final header = min(maxH * .22, 180);
+        final header = min(maxH * .18, 150);
         final logoW = min(maxW * .30, 120);
         final hPad = maxW < 500
             ? 16
@@ -71,13 +68,13 @@ class _AddVehiclePageState extends ConsumerState<AddVehiclePage> {
             _WhiteSheet(offset: header - 20),
             SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: hPad.toDouble())
-                  .add(EdgeInsets.only(top: header - 60)),
+                  .add(EdgeInsets.only(top: header - 60, bottom: 40)),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 440),
                   child: Column(
                     children: [
-                      SizedBox(height: header / 3),
+                      SizedBox(height: header / 4),
                       _FormCard(
                         formKey: _formKey,
                         dec: _dec,
@@ -86,15 +83,15 @@ class _AddVehiclePageState extends ConsumerState<AddVehiclePage> {
                         modelCtl: _modelCtl,
                         variantCtl: _variantCtl,
                         plateCtl: _plateCtl,
-                        actions: a,
-                        state: s,
+                        actions: actions,
+                        state: state,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            if (s.isSubmitting)
+            if (state.isSubmitting)
               const Center(child: CircularProgressIndicator()),
           ],
         );
@@ -102,8 +99,6 @@ class _AddVehiclePageState extends ConsumerState<AddVehiclePage> {
     );
   }
 }
-
-/* ───────── small header stuff ───────── */
 
 class _Header extends StatelessWidget {
   const _Header({required this.height, required this.logoW});
@@ -115,27 +110,14 @@ class _Header extends StatelessWidget {
       height: height,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
+          colors: [Color(0xFFFF6F3C), Color(0xFFe74b1a)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFff5c30), Color(0xFFe74b1a)],
         ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
-      child: Column(
-        children: [
-          Image.asset('assets/images/logo.png', width: logoW),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-            ),
-            child: Text('Add Vehicle', style: SemiboldTextFieldStyle()),
-          ),
-        ],
-      ),
+      alignment: Alignment.center,
+      child: Image.asset('assets/images/logo.png', width: logoW),
     );
   }
 }
@@ -143,6 +125,7 @@ class _Header extends StatelessWidget {
 class _WhiteSheet extends StatelessWidget {
   const _WhiteSheet({required this.offset});
   final double offset;
+
   @override
   Widget build(BuildContext context) => Positioned.fill(
         top: offset,
@@ -150,12 +133,17 @@ class _WhiteSheet extends StatelessWidget {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, -2),
+              ),
+            ],
           ),
         ),
       );
 }
-
-/* ───────── the form card ───────── */
 
 class _FormCard extends ConsumerWidget {
   const _FormCard({
@@ -173,59 +161,76 @@ class _FormCard extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final InputDecoration Function(String, IconData) dec;
   final TextEditingController typeCtl, makeCtl, modelCtl, variantCtl, plateCtl;
-  final dynamic actions; // VehicleNotifier
-  final dynamic state; // VehicleState
+  final dynamic actions;
+  final dynamic state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Material(
-      elevation: 6,
+      elevation: 8,
+      borderRadius: BorderRadius.circular(20),
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Form(
           key: formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                'Add Vehicle',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                  fontFamily: 'Poppins1',
+                ),
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: typeCtl,
                 onChanged: actions.setVehicleType,
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Enter vehicle type' : null,
-                decoration: dec('Vehicle Type', Icons.directions_car_filled),
+                decoration: dec('Vehicle Type', Icons.directions_car),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: makeCtl,
                 onChanged: actions.setMake,
                 decoration: dec('Make (optional)', Icons.factory),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: modelCtl,
                 onChanged: actions.setModel,
                 decoration: dec('Model (optional)', Icons.build),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: variantCtl,
                 onChanged: actions.setVariant,
                 decoration: dec('Variant (optional)', Icons.settings),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: plateCtl,
                 onChanged: actions.setPlate,
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Enter plate number' : null,
-                decoration: dec('Plate Number', Icons.numbers),
+                decoration: dec('Plate Number', Icons.confirmation_number),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
+              const SizedBox(height: 30),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add_circle_outline),
+                label: const Text(
+                  'Add Vehicle',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffff5722),
-                  minimumSize: const Size(double.infinity, 48),
+                  backgroundColor: Colors.orange[800],
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -235,15 +240,6 @@ class _FormCard extends ConsumerWidget {
                     await actions.addVehicle(context);
                   }
                 },
-                child: const Text(
-                  'ADD VEHICLE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontFamily: 'Poppins1',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ),
             ],
           ),

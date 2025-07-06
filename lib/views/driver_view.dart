@@ -82,6 +82,7 @@ class _DriverPageState extends ConsumerState<DriverPage> {
                     await actions.uploadCnicImage(cnicFile!.path, userId!);
                     await actions.uploadLicenseImage(licenseFile!.path, userId);
                     await actions.addDriver(userId);
+                    actions.gotoVehcile();
                   },
                   icon: const Icon(Icons.check_circle_outline),
                   label: const Text("Submit Driver Info"),

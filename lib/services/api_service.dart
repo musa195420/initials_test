@@ -511,7 +511,7 @@ class ApiServiceImpl implements IApiService {
         return ApiStatus(data: null, errorCode: "PA0001");
       }
       ApiResponse res = ApiResponse.fromJson(json.decode(response.body));
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         if (res.success ?? true) {
           return ApiStatus(
             data: null,
