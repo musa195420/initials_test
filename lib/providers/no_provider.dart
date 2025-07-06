@@ -34,6 +34,10 @@ class LogoutNotifier extends StateNotifier<AsyncValue<void>> {
   void gotoHome() {
     _nav.goTo(Routes.home);
   }
+
+  void gotoRide() {
+    _nav.goTo(Routes.ride);
+  }
 }
 
 final logoutProvider =

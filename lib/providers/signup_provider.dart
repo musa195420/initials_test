@@ -121,7 +121,11 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
         if (profRes.errorCode == 'PA0004') {
           _glob.setuser(profRes.data as UserProfile);
           await _hive.deleteAllAndAdd(profRes.data as UserProfile);
-          _nav.goTo(Routes.notfound);
+          if (state.roleId == 1) {
+            _nav.goTo(Routes.notfound);
+          } else if (state.roleId == 2) {
+            _nav.goTo(Routes.driver);
+          }
         }
       } else {
         _dialog.showApiError(res.data);

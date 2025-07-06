@@ -104,7 +104,11 @@ class HttpService {
   }
 
   Future<http.StreamedResponse> uploadImage(
-      String endpoint, Map<String, String> fields, String filePath) async {
+    String endpoint,
+    Map<String, String> fields,
+    String filePath, {
+    String fieldName = 'image', // default still works for profile upload
+  }) async {
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('${await _globalService.getHost()}/$endpoint'),
@@ -117,7 +121,9 @@ class HttpService {
     });
 
     request.fields.addAll(fields);
-    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    request.files.add(
+      await http.MultipartFile.fromPath(fieldName, filePath),
+    );
 
     return await request.send();
   }

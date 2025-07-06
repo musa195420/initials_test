@@ -59,10 +59,10 @@ class UserProfile extends IHiveBaseModel<UserProfile> {
   /// Dart → JSON
   @override
   Map<String, dynamic> toJson() => {
-        if (userId?.isNotEmpty ?? false) 'userId': userId,
+        if (userId?.isNotEmpty ?? false) 'user_id': userId,
         if (email?.isNotEmpty ?? false) 'email': email,
         if (password?.isNotEmpty ?? false) 'password': password,
-        if (fullName?.isNotEmpty ?? false) 'fullName': fullName,
+        if (fullName?.isNotEmpty ?? false) 'full_name': fullName,
         if (phone?.isNotEmpty ?? false) 'phone': phone,
         if (roleId != null) 'role_id': roleId,
         if (profileImage?.isNotEmpty ?? false) 'profile_image': profileImage,

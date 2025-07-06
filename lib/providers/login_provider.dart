@@ -56,9 +56,17 @@ class LoginNotifier extends StateNotifier<LoginState> {
       final profRes =
           await _api.getUserProfileByEmail(UserProfile(email: state.email));
       if (profRes.errorCode == 'PA0004') {
-        _glob.setuser(profRes.data as UserProfile);
+        UserProfile user = profRes.data as UserProfile;
         await _hive.deleteAllAndAdd(profRes.data as UserProfile);
-        _nav.goTo(Routes.notfound);
+        _glob.setuser(user);
+        if (user.roleId == 2) {
+          _nav.goTo(Routes.driverhome);
+          // _nav.goTo(Routes.driver);
+          // _nav.goTo(Routes.vehicle);
+        } else {
+          _nav.goTo(Routes.notfound);
+        }
+
         return true;
       } else {
         _dialog.showApiError(profRes.data);

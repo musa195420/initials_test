@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/views/driver_ride_view.dart';
+import 'package:initial_test/views/driver_view.dart';
 import 'package:initial_test/views/home.dart';
 import 'package:initial_test/views/login.dart';
 import 'package:initial_test/views/not_found_page.dart';
+import 'package:initial_test/views/ride_view.dart';
 import 'package:initial_test/views/signup.dart';
 import 'package:initial_test/views/startup.dart';
+import 'package:initial_test/views/vehicle.dart';
 
 final router = GoRouter(
   initialLocation: Routes.startup,
@@ -47,6 +51,34 @@ final router = GoRouter(
       path: Routes.home,
       pageBuilder: (_, __) => _buildPageWithTransition(
         const HomePage(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.ride,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const RideView(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.driver,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const DriverPage(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.vehicle,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const AddVehiclePage(),
+        AppTransition.slideFromRight,
+      ),
+    ),
+    GoRoute(
+      path: Routes.driverhome,
+      pageBuilder: (_, __) => _buildPageWithTransition(
+        const DriverRideView(),
         AppTransition.slideFromRight,
       ),
     ),
