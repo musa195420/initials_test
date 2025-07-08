@@ -28,6 +28,15 @@ jobs:
           channel: 'stable'
           architecture: x64
 
+      - name: Clean Flutter & iOS Cache
+        run: |
+          flutter clean
+          rm -rf ios/Pods ios/Podfile.lock
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
       - name: Build Android APK (Split ABI)
         run: flutter build apk --release --split-per-abi
 
