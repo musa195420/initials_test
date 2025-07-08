@@ -1,18 +1,21 @@
+# Minimum iOS deployment version
 platform :ios, '13.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+# Disable CocoaPods analytics
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
+# Define Xcode build schemes for the Runner project
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
   'Release' => :release,
 }
 
+# Resolve Flutter root for plugin linking
 def flutter_root
   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
   unless File.exist?(generated_xcode_build_settings_path)
-    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter build has been run first."
+    raise "#{generated_xcode_build_settings_path} must exist. Run 'flutter build ios' first."
   end
 
   File.foreach(generated_xcode_build_settings_path) do |line|
@@ -20,14 +23,16 @@ def flutter_root
     return matches[1].strip if matches
   end
 
-  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try running flutter build ios first."
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}."
 end
 
+# Load Flutter pod helper from Flutter SDK
 require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
+# Main iOS target block
 target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
+  # Use static frameworks to avoid module errors like "No such module 'Flutter'"
+  use_frameworks! :linkage => :static
 
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
 end
