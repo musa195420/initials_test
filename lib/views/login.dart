@@ -1,114 +1,58 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/helper/routes.dart';
-import 'package:initial_test/providers/login_provider.dart';
-import 'package:initial_test/services/navigation_service.dart';
-import 'package:initial_test/states/login_state.dart';
+import 'package:get/get.dart';
+import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/providers/login_controller.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
 
-class LogIn extends ConsumerStatefulWidget {
-  const LogIn({super.key});
+class LogIn extends StatelessWidget {
+  LogIn({super.key});
 
-  @override
-  ConsumerState<LogIn> createState() => _LogInState();
-}
-
-class _LogInState extends ConsumerState<LogIn> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _emailCtl;
-  late final TextEditingController _passCtl;
-
-  @override
-  void initState() {
-    super.initState();
-    final state = ref.read(loginProvider);
-    _emailCtl = TextEditingController(text: state.email);
-    _passCtl = TextEditingController(text: state.password);
-  }
-
-  @override
-  void dispose() {
-    _emailCtl.dispose();
-    _passCtl.dispose();
-    super.dispose();
-  }
+  final LoginController controller = Get.find<LoginController>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(loginProvider);
-    final actions = ref.read(loginProvider.notifier);
+    final double maxW = Get.width;
+    final double maxH = Get.height;
 
-    final keyIcon = state.obscureText
-        ? const Icon(Icons.key)
-        : const Icon(Icons.key_off_outlined);
+    final double headerH = min(maxH * .35, 280);
+    final double logoW = min(maxW * .45, 160);
+    final double hPad = maxW < 500
+        ? 16
+        : maxW < 800
+            ? 32
+            : 64;
 
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double maxW = constraints.maxWidth;
-          final double maxH = constraints.maxHeight;
-
-          // Cap sizes so they don’t grow uncontrollably
-          final double headerH = min(maxH * .35, 280);
-          final double logoW = min(maxW * .45, 160);
-
-          // Horizontal padding scales a bit, but the real width is capped later.
-          final double hPad = maxW < 500
-              ? 16
-              : maxW < 800
-                  ? 32
-                  : 64;
-
-          return Stack(
-            children: [
-              _HeaderBackground(
-                height: headerH,
-                logoW: logoW,
-              ),
-              _WhiteBottomBox(
-                  offset: headerH - 20), // -20 to tuck under header curve
-              // ─────────── Main scrollable content ───────────
-              SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: hPad)
-                    .add(EdgeInsets.only(top: headerH - 60)),
-                child: Center(
-                  // <= This keeps everything phone-sized even on wide screens
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 440),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: headerH / 2,
-                        ),
-                        _FormCard(
-                          formKey: _formKey,
-                          emailCtl: _emailCtl,
-                          passCtl: _passCtl,
-                          keyIcon: keyIcon,
-                          state: state,
-                          actions: actions,
-                        ),
-                        const SizedBox(height: 28),
-                        _SignUpLink(),
-                      ],
-                    ),
-                  ),
+      body: Stack(
+        children: [
+          _HeaderBackground(height: headerH, logoW: logoW),
+          _WhiteBottomBox(offset: headerH - 20),
+          SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: hPad)
+                .add(EdgeInsets.only(top: headerH - 60)),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Column(
+                  children: [
+                    SizedBox(height: headerH / 2),
+                    _FormCard(formKey: _formKey, controller: controller),
+                    const SizedBox(height: 28),
+                    _SignUpLink(),
+                  ],
                 ),
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 /* ───────────────────── UI pieces ───────────────────── */
-
 class _HeaderBackground extends StatelessWidget {
   const _HeaderBackground({required this.height, required this.logoW});
   final double height;
@@ -194,21 +138,11 @@ class _Title extends StatelessWidget {
 class _FormCard extends StatelessWidget {
   const _FormCard({
     required GlobalKey<FormState> formKey,
-    required TextEditingController emailCtl,
-    required TextEditingController passCtl,
-    required this.keyIcon,
-    required this.state,
-    required this.actions,
-  })  : _formKey = formKey,
-        _emailCtl = emailCtl,
-        _passCtl = passCtl;
+    required this.controller,
+  }) : _formKey = formKey;
 
   final GlobalKey<FormState> _formKey;
-  final TextEditingController _emailCtl;
-  final TextEditingController _passCtl;
-  final Icon keyIcon;
-  final LoginState state;
-  final LoginNotifier actions;
+  final LoginController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -222,10 +156,9 @@ class _FormCard extends StatelessWidget {
           key: _formKey,
           child: Column(
             children: [
-              // ────────── Email ──────────
+              // Email
               TextFormField(
-                controller: _emailCtl,
-                onChanged: actions.setEmail,
+                onChanged: controller.setEmail,
                 validator: (v) =>
                     (v == null || v.isEmpty) ? 'Enter your e-mail' : null,
                 decoration: _inputDecoration(
@@ -234,21 +167,22 @@ class _FormCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              // ───────── Password ────────
-              TextFormField(
-                controller: _passCtl,
-                onChanged: actions.setPassword,
-                obscureText: state.obscureText,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Enter your password' : null,
-                decoration: _inputDecoration(
-                  'Password',
-                  GestureDetector(
-                    onTap: actions.togglePasswordVisibility,
-                    child: keyIcon,
-                  ),
-                ),
-              ),
+              // Password
+              Obx(() => TextFormField(
+                    onChanged: controller.setPassword,
+                    obscureText: controller.obscureText.value,
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Enter your password' : null,
+                    decoration: _inputDecoration(
+                      'Password',
+                      GestureDetector(
+                        onTap: controller.togglePasswordVisibility,
+                        child: controller.obscureText.value
+                            ? const Icon(Icons.key)
+                            : const Icon(Icons.key_off_outlined),
+                      ),
+                    ),
+                  )),
               const SizedBox(height: 26),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -259,9 +193,9 @@ class _FormCard extends StatelessWidget {
                   ),
                   elevation: 3,
                 ),
-                onPressed: () async {
+                onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    await actions.userLogin(context);
+                    controller.userLogin();
                   }
                 },
                 child: const Text(
@@ -302,12 +236,9 @@ class _FormCard extends StatelessWidget {
 }
 
 class _SignUpLink extends StatelessWidget {
-  _SignUpLink();
-  final nav = locator<NavigationService>();
-
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () => nav.goTo(Routes.signup),
+        onTap: () => Get.toNamed(AppRoutes.signup),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(

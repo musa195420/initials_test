@@ -1,25 +1,40 @@
 // lib/screens/logout_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:initial_test/providers/no_provider.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/providers/no_provider.dart'; // assuming this sets up GetIt
 
-class NotFoundPage extends ConsumerWidget {
+class NotFoundPage extends StatefulWidget {
   const NotFoundPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final logoutState = ref.watch(logoutProvider);
-    final logoutNotifier = ref.read(logoutProvider.notifier);
+  State<NotFoundPage> createState() => _NotFoundPageState();
+}
 
+class _NotFoundPageState extends State<NotFoundPage> {
+  final LogoutController _controller = Get.find<LogoutController>();
+  bool isLoading = false;
+
+  void _logout() async {
+    setState(() => isLoading = true);
+    await _controller.logout();
+    setState(() => isLoading = false);
+  }
+
+  void _getUser() async {
+    await _controller.getUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Logout'),
-      ),
+      appBar: AppBar(title: const Text('Logout')),
       body: Center(
-        child: logoutState.isLoading
+        child: isLoading
             ? const CircularProgressIndicator()
             : Column(
-                spacing: 40,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton.icon(
                     icon: const Icon(Icons.logout),
@@ -27,15 +42,16 @@ class NotFoundPage extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () => logoutNotifier.logout(),
+                    onPressed: _logout,
                   ),
+                  const SizedBox(height: 20),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.person),
                     label: const Text('Get User'),
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12)),
-                    onPressed: () => logoutNotifier.getUser(),
+                    onPressed: _getUser,
                   ),
                 ],
               ),

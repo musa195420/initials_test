@@ -3,28 +3,30 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/error_debugger.dart';
 import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/models/hive_models/hive_user.dart';
-import 'package:initial_test/services/hive_service.dart';
+import 'package:initial_test/providers/auth_controller.dart';
+import 'package:initial_test/providers/login_controller.dart';
+import 'package:initial_test/providers/no_provider.dart';
+import 'package:initial_test/providers/signup_provider.dart';
 import 'package:initial_test/services/pref_service.dart';
-
+import 'package:initial_test/views/not_found_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 String tag = "main.dart";
+
 void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
-        // 2️⃣ FIRST
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      await LocatorInjector.setupLocator(); // 3️⃣
+      await LocatorInjector.setupLocator(); // Retain your DI setup
       registerLoader();
       await configSettings();
       HttpOverrides.global = CustomHttpOverrides();
@@ -37,18 +39,23 @@ void main() {
 }
 
 Future configSettings() async {
-  // Init Services
-
   try {
-    await locator<PrefService>().init();
+    //await locator<PrefService>().init();
 
     final appDocumentDirectory =
         await path_provider.getApplicationDocumentsDirectory();
     Hive.init("${appDocumentDirectory.path}/pet_adoption");
-    await locator<IHiveService<HiveUser>>().init();
-    //init methods of all like init language errors locator<NotificationServices>().requestNotificationPermissions();
-  } catch (e) {
-    debugPrint("Error => $e");
+    final PrefService prefService = Get.find<PrefService>();
+    await prefService.init(); // Must await before first usage
+    Get.put(AuthController());
+    Get.put(LoginController());
+    Get.put(SignUpController());
+    Get.put(LogoutController());
+    // Example of using Get.put if you want to inject services this way
+    //
+    // Get.put(locator<IHiveService<HiveUser>>());
+  } catch (e, s) {
+    printError(tag: tag, error: e.toString(), stack: s.toString());
   }
 }
 
@@ -63,7 +70,7 @@ Future<void> registerLoader() async {
     ..backgroundColor = Colors.green
     ..indicatorColor = Colors.yellow
     ..textColor = Colors.yellow
-    ..maskColor = Colors.blue.withValues(alpha: 0.5)
+    ..maskColor = Colors.blue.withAlpha(128)
     ..userInteractions = false
     ..maskType = EasyLoadingMaskType.black
     ..dismissOnTap = false;
@@ -72,21 +79,25 @@ Future<void> registerLoader() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: Colors.black,
-            surface: Colors.white,
-          ),
-          useMaterial3: true,
-        ),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.startup,
+      getPages: AppRoutes.pages,
+      unknownRoute: GetPage(
+        name: '/notfound',
+        page: () => const NotFoundPage(),
+        transition: Transition.rightToLeft,
       ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.black,
+          surface: Colors.white,
+        ),
+        useMaterial3: true,
+      ),
+      builder: EasyLoading.init(),
     );
   }
 }

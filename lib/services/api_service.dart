@@ -1,10 +1,10 @@
-import 'package:initial_test/helper/locator.dart';
+import 'package:get/get.dart';
 import 'package:initial_test/services/firebase_database.dart';
 
 import '../../models/user_model.dart';
 
 class ApiServiceImpl implements IApiService {
-  final IFirebaseDatabase _db = locator<IFirebaseDatabase>();
+  final IFirebaseDatabase _db = Get.find<IFirebaseDatabase>();
 
   ApiServiceImpl();
 

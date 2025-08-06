@@ -1,67 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/helper/routes.dart';
-import 'package:initial_test/models/user_model.dart';
-import 'package:initial_test/services/api_service.dart';
-import 'package:initial_test/services/firebase_service.dart';
-import 'package:initial_test/services/navigation_service.dart';
+import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/services/pref_service.dart';
-import 'package:initial_test/states/signup_state.dart';
+import 'package:initial_test/services/api_service.dart';
+import 'package:initial_test/models/user_model.dart';
 
-class SignUpNotifier extends StateNotifier<SignUpState> {
-  final _apiService = locator<IApiService>();
-  final PrefService _prefService = locator<PrefService>();
-  final _firebase = locator<IFirebaseService>();
-  final _nav = locator<NavigationService>();
-  SignUpNotifier() : super(const SignUpState());
+class SignUpController extends GetxController {
+  var name = ''.obs;
+  var email = ''.obs;
+  var password = ''.obs;
+  var repassword = ''.obs;
+  var obscureText = true.obs;
 
-  // ⚡ setters called by onChanged
-  void setName(String v) => state = state.copyWith(name: v);
-  void setEmail(String v) => state = state.copyWith(email: v);
-  void setPassword(String v) => state = state.copyWith(password: v);
-  void setRePassword(String v) => state = state.copyWith(repassword: v);
+  final PrefService _prefService = Get.find();
+  final IApiService _apiService = Get.find();
 
-  void togglePasswordVisibility() =>
-      state = state.copyWith(obscureText: !state.obscureText);
+  void setName(String v) => name.value = v;
+  void setEmail(String v) => email.value = v;
+  void setPassword(String v) => password.value = v;
+  void setRePassword(String v) => repassword.value = v;
 
-  Future<void> registerUser(BuildContext ctx) async {
+  void togglePasswordVisibility() => obscureText.value = !obscureText.value;
+
+  Future<void> registerUser() async {
     try {
-      var res =
-          await _firebase.signUp(email: state.email, password: state.password);
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: email.value, password: password.value);
 
-      if (res is AuthSuccess<UserCredential>) {
-        final user = res.data.user!;
-        _apiService.addUser(UserModel(
-            id: user.uid,
-            name: user.displayName ?? "",
-            email: user.email ?? "",
-            wallet: 0));
-
-        _prefService.setString(PrefKey.userId, user.uid);
-        _nav.goTo(Routes.notfound);
-        debugPrint(user.displayName);
-      } else if (res is AuthFailure) {
-        // handle the error
-        //showError(res.message);
-      }
+      final user = credential.user!;
+      _apiService.addUser(UserModel(
+        id: user.uid,
+        name: name.value,
+        email: user.email ?? '',
+        wallet: 0,
+      ));
+      _prefService.setString(PrefKey.userId, user.uid);
+      Get.offAllNamed(AppRoutes.notFound);
     } on FirebaseAuthException catch (e) {
       final msg = switch (e.code) {
         'weak-password' => 'The provided password is too weak.',
         'email-already-in-use' => 'This email is already registered.',
         _ => 'Registration failed.',
       };
-      if (ctx.mounted) {
-        ScaffoldMessenger.of(ctx).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: Colors.red),
-        );
-      }
+      Get.snackbar('Error', msg,
+          backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 }
-
-final signupProvider =
-    StateNotifierProvider<SignUpNotifier, SignUpState>((ref) {
-  return SignUpNotifier();
-});
