@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/providers/auth_controller.dart';
+import 'package:initial_test/services/navigation_service.dart';
+
+final NavigationService _nav = Get.find<NavigationService>();
 
 class StartupPage extends StatefulWidget {
   const StartupPage({super.key});
@@ -13,17 +17,17 @@ class StartupPage extends StatefulWidget {
 
 class _StartupPageState extends State<StartupPage> {
   final AuthController _authController = Get.find<AuthController>();
+  late final StreamSubscription<User?> _authSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ Listen to changes
-    ever<User?>(_authController.userRx, (user) {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      _authController.userRx.value = user; // Update observable
       _navigateBasedOnUser(user);
     });
 
-    // ✅ Also handle the initial value manually
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigateBasedOnUser(_authController.userRx.value);
     });
@@ -31,10 +35,16 @@ class _StartupPageState extends State<StartupPage> {
 
   void _navigateBasedOnUser(User? user) {
     if (user != null) {
-      Get.offAllNamed(AppRoutes.notFound);
+      _nav.goToAndClear(Routes.notfound);
     } else {
-      Get.offAllNamed(AppRoutes.login);
+      _nav.goToAndClear(Routes.login);
     }
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    super.dispose();
   }
 
   @override

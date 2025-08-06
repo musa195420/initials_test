@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/providers/login_controller.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
 
@@ -201,10 +201,10 @@ class _FormCard extends StatelessWidget {
                 child: const Text(
                   'Login',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Poppins1',
-                    fontWeight: FontWeight.w500,
-                  ),
+                      fontSize: 18,
+                      fontFamily: 'Poppins1',
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
                 ),
               ),
             ],
@@ -238,7 +238,7 @@ class _FormCard extends StatelessWidget {
 class _SignUpLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () => Get.toNamed(AppRoutes.signup),
+        onTap: () => Get.toNamed(Routes.signup),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(

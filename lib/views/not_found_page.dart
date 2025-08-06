@@ -1,8 +1,6 @@
 // lib/screens/logout_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/providers/logout_controller.dart'; // assuming this sets up GetIt
 
 class NotFoundPage extends StatefulWidget {
@@ -17,9 +15,7 @@ class _NotFoundPageState extends State<NotFoundPage> {
   bool isLoading = false;
 
   void _logout() async {
-    setState(() => isLoading = true);
     await _controller.logout();
-    setState(() => isLoading = false);
   }
 
   void _getUser() async {

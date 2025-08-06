@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/services/pref_service.dart';
 
 class LoginController extends GetxController {
@@ -26,7 +27,7 @@ class LoginController extends GetxController {
       if (res.user != null) {
         await _prefService.setString(PrefKey.userId, res.user!.uid);
         isLoggedIn.value = true;
-        Get.offAllNamed(AppRoutes.notFound);
+        Get.offAllNamed(Routes.notfound);
         _showPopup('Welcome back!', 15);
       }
     } on FirebaseAuthException catch (e) {

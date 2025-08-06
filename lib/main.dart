@@ -9,10 +9,12 @@ import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
 import 'package:initial_test/helper/error_debugger.dart';
 import 'package:initial_test/helper/locator.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/providers/auth_controller.dart';
 import 'package:initial_test/providers/login_controller.dart';
 import 'package:initial_test/providers/logout_controller.dart';
 import 'package:initial_test/providers/signup_controller.dart';
+import 'package:initial_test/providers/user_controller.dart';
 import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/views/not_found_page.dart';
@@ -53,6 +55,7 @@ Future configSettings() async {
     Get.put(LoginController());
     Get.put(SignUpController());
     Get.put(LogoutController());
+    Get.put(UserController());
     // Example of using Get.put if you want to inject services this way
     //
     // Get.put(locator<IHiveService<HiveUser>>());
@@ -85,7 +88,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.startup,
+      initialRoute: Routes.startup,
       navigatorKey: NavigationService.instance.navigatorKey,
       getPages: AppRoutes.pages,
       unknownRoute: GetPage(

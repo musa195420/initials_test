@@ -1,34 +1,36 @@
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/views/login.dart';
 import 'package:initial_test/views/not_found_page.dart';
 import 'package:initial_test/views/signup.dart';
 import 'package:initial_test/views/startup.dart';
 import 'package:get/get.dart';
+import 'package:initial_test/views/user_page.dart';
 
 class AppRoutes {
-  static const String startup = '/';
-  static const String login = '/login';
-  static const String signup = '/signup';
-  static const String notFound = '/notfound';
-
   static final List<GetPage> pages = [
     GetPage(
-      name: startup,
+      name: Routes.startup,
       page: () => const StartupPage(),
       transition: Transition.fade,
     ),
     GetPage(
-      name: login,
+      name: Routes.login,
       page: () => LogIn(),
       transition: Transition.downToUp,
     ),
     GetPage(
-      name: signup,
+      name: Routes.signup,
       page: () => SignUp(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
-      name: notFound,
+      name: Routes.notfound,
       page: () => const NotFoundPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: Routes.userpage,
+      page: () => const UserListPage(),
       transition: Transition.rightToLeft,
     ),
   ];

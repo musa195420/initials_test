@@ -8,7 +8,7 @@ import 'package:initial_test/services/firebase_service.dart';
 import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 
-class LogoutController {
+class LogoutController extends GetxController {
   final IApiService _apiService = Get.find<IApiService>();
   final IDialogService _dialogService = Get.find<IDialogService>();
   final PrefService _prefService = Get.find<PrefService>();
@@ -30,11 +30,12 @@ class LogoutController {
   }
 
   Future<void> getUser() async {
-    var userId = await _prefService.getString(PrefKey.userId);
-    UserModel? user = await _apiService.getUserById(userId);
-    if (user != null) {
-      await _dialogService.showSuccess(text: user.email);
-      debugPrint(user.id);
-    }
+    _nav.goTo(Routes.userpage);
+    // var userId = await _prefService.getString(PrefKey.userId);
+    // UserModel? user = await _apiService.getUserById(userId);
+    // if (user != null) {
+    //   await _dialogService.showSuccess(text: user.email);
+    //   debugPrint(user.id);
+    // }
   }
 }

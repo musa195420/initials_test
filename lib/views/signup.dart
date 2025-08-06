@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/routes.dart';
 import 'package:initial_test/providers/signup_controller.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
 
@@ -41,7 +41,7 @@ class SignUp extends StatelessWidget {
                     _FormCard(formKey: _formKey, controller: controller),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () => Get.toNamed(AppRoutes.login),
+                      onTap: () => Get.toNamed(Routes.login),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(

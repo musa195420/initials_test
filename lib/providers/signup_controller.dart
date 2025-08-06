@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/routes.dart';
+import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/services/api_service.dart';
 import 'package:initial_test/models/user_model.dart';
@@ -15,6 +16,8 @@ class SignUpController extends GetxController {
 
   final PrefService _prefService = Get.find();
   final IApiService _apiService = Get.find();
+
+  final NavigationService _nav = Get.find();
 
   void setName(String v) => name.value = v;
   void setEmail(String v) => email.value = v;
@@ -37,7 +40,7 @@ class SignUpController extends GetxController {
         wallet: 0,
       ));
       _prefService.setString(PrefKey.userId, user.uid);
-      Get.offAllNamed(AppRoutes.notFound);
+      _nav.goToAndClear(Routes.notfound);
     } on FirebaseAuthException catch (e) {
       final msg = switch (e.code) {
         'weak-password' => 'The provided password is too weak.',
