@@ -11,8 +11,9 @@ import 'package:initial_test/helper/error_debugger.dart';
 import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/providers/auth_controller.dart';
 import 'package:initial_test/providers/login_controller.dart';
-import 'package:initial_test/providers/no_provider.dart';
-import 'package:initial_test/providers/signup_provider.dart';
+import 'package:initial_test/providers/logout_controller.dart';
+import 'package:initial_test/providers/signup_controller.dart';
+import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 import 'package:initial_test/views/not_found_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -85,6 +86,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.startup,
+      navigatorKey: NavigationService.instance.navigatorKey,
       getPages: AppRoutes.pages,
       unknownRoute: GetPage(
         name: '/notfound',

@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:initial_test/services/navigation_service.dart';
 
 class DialogService implements IDialogService {
-  NavigationService get _navigationService => Get.find<NavigationService>();
-
   @override
   Future<void> showSuccess({String text = 'Operation Successful'}) async {
     final context = Get.context!;

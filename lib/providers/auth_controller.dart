@@ -11,7 +11,6 @@ class AuthController extends GetxController {
     // Listen to Firebase auth changes and assign to userRx
     // Listen to Firebase auth state and assign to userRx
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      debugPrint("Firebase Auth Changed: $user"); // Debug log
       userRx.value = user; // <- THIS MUST BE PRESENT!
     });
   }

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:initial_test/helper/app_router.dart';
-import 'package:initial_test/providers/signup_provider.dart';
+import 'package:initial_test/providers/signup_controller.dart';
 import 'package:initial_test/widget_support/text_styles.dart';
 
 class SignUp extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:initial_test/helper/locator.dart';
-import 'package:initial_test/providers/no_provider.dart'; // assuming this sets up GetIt
+import 'package:initial_test/providers/logout_controller.dart'; // assuming this sets up GetIt
 
 class NotFoundPage extends StatefulWidget {
   const NotFoundPage({super.key});

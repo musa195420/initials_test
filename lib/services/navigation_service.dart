@@ -1,41 +1,29 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-enum AppTransition {
-  fade,
-  slideFromRight,
-  slideFromBottom,
-  scale,
-  none,
-}
+import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 
 class NavigationService {
-  NavigationService();
   NavigationService._privateConstructor();
   static final NavigationService _instance =
       NavigationService._privateConstructor();
   static NavigationService get instance => _instance;
 
-  // ✅ Immediately initialized
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  void goTo(String routeName, {Object? extra, bool replace = false}) {
-    debugPrint('Navigating to $routeName');
-    final context = navigatorKey.currentContext!;
+
+  void goTo(String routeName, {Object? arguments, bool replace = false}) {
     if (replace) {
-      context.go(routeName, extra: extra);
+      Get.offNamed(routeName, arguments: arguments);
     } else {
-      context.push(routeName, extra: extra);
+      Get.toNamed(routeName, arguments: arguments);
     }
   }
 
-  void goToAndClear(String routeName, {Object? extra}) {
-    final context = navigatorKey.currentContext!;
-    context.go(routeName, extra: extra);
+  void goToAndClear(String routeName, {Object? arguments}) {
+    Get.offAllNamed(routeName, arguments: arguments);
   }
 
   void goBack([Object? result]) {
-    if (navigatorKey.currentState?.canPop() == true) {
-      navigatorKey.currentState?.pop(result);
+    if (Get.key.currentState?.canPop() == true) {
+      Get.back(result: result);
     }
   }
 }
