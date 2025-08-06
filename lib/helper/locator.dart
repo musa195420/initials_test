@@ -9,7 +9,7 @@ import 'package:initial_test/services/hive_service.dart';
 import 'package:initial_test/services/navigation_service.dart';
 import 'package:initial_test/services/pref_service.dart';
 
-import 'package:initial_test/helper/error_debugger.dart' as d;
+import 'package:initial_test/helper/error_debugger.dart';
 
 class LocatorInjector {
   static Future<void> setupLocator() async {
@@ -24,7 +24,7 @@ class LocatorInjector {
       Get.lazyPut<IApiService>(() => ApiServiceImpl());
       Get.lazyPut<IHiveService<HiveUser>>(() => HiveUserRepo());
     } catch (e, s) {
-      d.printError(error: e.toString(), stack: s.toString(), tag: "locator");
+      printStackDebug(error: e.toString(), stack: s.toString(), tag: "locator");
     }
   }
 }

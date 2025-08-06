@@ -9,8 +9,9 @@ class DialogService implements IDialogService {
 
   @override
   Future<void> showSuccess({String text = 'Operation Successful'}) async {
+    final context = Get.context!;
     showDialog(
-      context: _navigationService.navigatorKey.currentContext!,
+      context: context,
       barrierDismissible: false, // prevent closing manually
       builder: (BuildContext dialogContext) {
         Future.delayed(const Duration(seconds: 2), () {

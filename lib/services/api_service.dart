@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:initial_test/helper/error_debugger.dart';
 import 'package:initial_test/services/firebase_database.dart';
 
 import '../../models/user_model.dart';
@@ -36,13 +37,19 @@ class ApiServiceImpl implements IApiService {
     );
   }
 
+  String tag = "_apiService";
   @override
   Future<UserModel?> getUserById(String id) async {
-    final data = await _db.getDocumentById(
-      collection: _usercollection,
-      docId: id,
-    );
-    return data != null ? UserModel.fromJson(data) : null;
+    try {
+      final data = await _db.getDocumentById(
+        collection: _usercollection,
+        docId: id,
+      );
+      return data != null ? UserModel.fromJson(data) : null;
+    } catch (e, s) {
+      printStackDebug(error: e.toString(), stack: s.toString(), tag: tag);
+    }
+    return null;
   }
 
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<void> printError({
+Future<void> printStackDebug({
   required String tag,
   required String error,
   String? stack,

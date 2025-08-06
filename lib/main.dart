@@ -33,7 +33,8 @@ void main() {
       runApp(const MyApp());
     },
     (Object error, StackTrace stack) {
-      printError(error: error.toString(), stack: stack.toString(), tag: tag);
+      printStackDebug(
+          error: error.toString(), stack: stack.toString(), tag: tag);
     },
   );
 }
@@ -55,7 +56,7 @@ Future configSettings() async {
     //
     // Get.put(locator<IHiveService<HiveUser>>());
   } catch (e, s) {
-    printError(tag: tag, error: e.toString(), stack: s.toString());
+    printStackDebug(tag: tag, error: e.toString(), stack: s.toString());
   }
 }
 
