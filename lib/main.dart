@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:initial_test/firebase_options.dart';
 import 'package:initial_test/helper/app_router.dart';
+import 'package:initial_test/helper/error_debugger.dart';
 import 'package:initial_test/helper/locator.dart';
 import 'package:initial_test/models/hive_models/hive_user.dart';
 import 'package:initial_test/services/hive_service.dart';
@@ -14,6 +15,7 @@ import 'package:initial_test/services/pref_service.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
 
+String tag = "main.dart";
 void main() {
   runZonedGuarded(
     () async {
@@ -29,7 +31,7 @@ void main() {
       runApp(const MyApp());
     },
     (Object error, StackTrace stack) {
-      debugPrint("Error in ${error.toString()} Stack ${stack.toString()}");
+      printError(error: error.toString(), stack: stack.toString(), tag: tag);
     },
   );
 }
