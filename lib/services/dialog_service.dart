@@ -11,12 +11,11 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class DialogService implements IDialogService {
   NavigationService get _navigationService => locator<NavigationService>();
-
   @override
   Future<void> showSuccess({String text = 'Operation Successful'}) async {
     showDialog(
       context: _navigationService.navigatorKey.currentContext!,
-      barrierDismissible: false, // prevent closing manually
+      barrierDismissible: false, // Prevent manual close
       builder: (BuildContext dialogContext) {
         Future.delayed(const Duration(seconds: 2), () {
           if (dialogContext.mounted) {
@@ -25,24 +24,40 @@ class DialogService implements IDialogService {
         });
 
         return Dialog(
+          backgroundColor: const Color(0xFF1C1C1E), // Dark background
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           child: Container(
             width: 300,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E), // Dark gray
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle, size: 60, color: Colors.green),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  size: 70,
+                  color: Colors.orangeAccent,
+                ),
                 const SizedBox(height: 20),
                 Text(
                   text,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
                   ),
                 ),
               ],
@@ -54,10 +69,10 @@ class DialogService implements IDialogService {
   }
 
   @override
-  Future<void> showError({String text = 'Operation Not  Successful'}) async {
+  Future<void> showError({String text = 'Operation Not Successful'}) async {
     showDialog(
       context: _navigationService.navigatorKey.currentContext!,
-      barrierDismissible: false, // prevent closing manually
+      barrierDismissible: false, // Prevent manual close
       builder: (BuildContext dialogContext) {
         Future.delayed(const Duration(seconds: 2), () {
           if (dialogContext.mounted) {
@@ -66,23 +81,38 @@ class DialogService implements IDialogService {
         });
 
         return Dialog(
+          backgroundColor: const Color(0xFF1C1C1E), // Dark background
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           child: Container(
             width: 300,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.redAccent.withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(100),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.redAccent,
                   ),
-                  child: Image.asset("assets/images/error.png"),
+                  padding: const EdgeInsets.all(12),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 40,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -90,8 +120,8 @@ class DialogService implements IDialogService {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
                   ),
                 ),
               ],
@@ -106,23 +136,23 @@ class DialogService implements IDialogService {
   Future<bool> showApiError(dynamic dynamicRes) async {
     String code = "404";
     String error = "An Error Occurred";
-    String message =
-        "Please  Contact the administrator. Or Get Back To Us Later!";
+    String message = "Please contact the administrator. Or try again later!";
     ErrorResponse? errorResponse;
+
     try {
       errorResponse = dynamicRes as ErrorResponse;
     } catch (e) {
       errorResponse = ErrorResponse(
-          error: "Server Not Reachable",
-          errorCode: "500",
-          message:
-              "Please  Contact the administrator. Or Get Back To Us Later!");
+        error: "Server Not Reachable",
+        errorCode: "500",
+        message: "Please contact the administrator. Or try again later!",
+      );
     }
 
     error = errorResponse.error ?? "An Unexpected Error Occurred";
     code = errorResponse.errorCode ?? "404";
     message = errorResponse.message ??
-        "Please  Contact the administrator. Or Get Back To Us Later!";
+        "Please contact the administrator. Or try again later!";
 
     if (EasyLoading.isShow) {
       await EasyLoading.dismiss();
@@ -137,7 +167,7 @@ class DialogService implements IDialogService {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              backgroundColor: const Color(0xFFFAF3E0),
+              backgroundColor: const Color(0xFF1C1C1E), // Dark background
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(
@@ -149,76 +179,102 @@ class DialogService implements IDialogService {
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: SingleChildScrollView(
-                    // Wrap the entire column
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset(
-                          'assets/images/error.png',
-                          height: MediaQuery.of(_navigationService
-                                      .navigatorKey.currentContext!)
-                                  .size
-                                  .height *
-                              0.22,
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.redAccent,
+                          ),
+                          padding: const EdgeInsets.all(14),
+                          child: const Icon(
+                            Icons.close_rounded,
+                            size: 48,
+                            color: Colors.white,
+                          ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         Text(
                           "Oops! Something went wrong",
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF3E2723),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orangeAccent,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Color(0xFFCCBFB8)),
+                            color: const Color(
+                                0xFF2C2C2E), // Slightly lighter dark
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                                color: Colors.orangeAccent.withOpacity(0.3)),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
+                                color: Colors.orangeAccent.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Code: $code",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  )),
-                              const SizedBox(height: 6),
-                              Text("Error: $error",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Color.fromARGB(255, 239, 7, 7),
-                                  )),
-                              const SizedBox(height: 6),
-                              Text("Message: $message",
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black54,
-                                  )),
+                              Text(
+                                "Code: $code",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Error: $error",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Message: $message",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white70,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 24),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: TextButton(
-                            child: Text("Got It"),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                            ),
                             onPressed: () {
                               _navigationService.goBack();
                             },
+                            child: const Text(
+                              "Got It",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
                       ],

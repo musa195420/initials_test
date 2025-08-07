@@ -72,7 +72,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
         final res = await _api.addride(ride); // <- your existing endpoint
         if (res.errorCode == 'PA0004') {
-          _dlg.showSuccess(text: 'Ride requested ✔');
+          _dlg.showSuccess(text: 'Ride requested');
           // e.g. _nav.goTo(Routes.rideWaiting);
         } else {
           _dlg.showApiError(res.data);
