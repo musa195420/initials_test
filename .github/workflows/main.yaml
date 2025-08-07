@@ -1,3 +1,5 @@
+name: "Build & Release"
+
 on:
   pull_request:
     branches:
@@ -9,23 +11,26 @@ on:
       - provider
       - rideApp
 
-name: "Build & Release"
-
 jobs:
   build:
     name: Build & Release
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
+    runs-on: macos-14 # Use latest available macOS runner
 
-      - uses: actions/setup-java@v3
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java (for Android)
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          flutter-version: '3.22.0' # Replace with your version if needed
+          channel: stable
           architecture: x64
 
       - name: Clean Flutter & iOS Cache
@@ -34,25 +39,33 @@ jobs:
           rm -rf ios/Pods ios/Podfile.lock
           rm -rf ~/Library/Developer/Xcode/DerivedData
 
-      - name: Install Flutter dependencies
+      - name: Get Flutter Packages
         run: flutter pub get
 
+      # Android Build
       - name: Build Android APK (Split ABI)
         run: flutter build apk --release --split-per-abi
 
+      # iOS Build
+      - name: Install CocoaPods Dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
       - name: Build iOS IPA (No Code Signing)
         run: |
-          flutter build ios --no-codesign --no-tree-shake-icons
+          flutter build ios --release --no-codesign --no-tree-shake-icons
           cd build/ios/iphoneos
-          mkdir Payload
-          cd Payload
-          ln -s ../Runner.app
-          cd ..
+          mkdir -p Payload
+          cp -r Runner.app Payload/
           zip -r app.ipa Payload
 
-      - name: Push to Releases
+      - name: Upload Build Artifacts
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/apk/release/*,build/ios/iphoneos/app.ipa"
+          artifacts: |
+            build/app/outputs/apk/release/*.apk,
+            build/ios/iphoneos/app.ipa
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
