@@ -130,7 +130,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ]),
             ],
           ),
-
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.navigate_before,
+                  size: 30,
+                ),
+                onPressed: () {
+                  nav.goBack();
+                },
+                color: Colors.black,
+              )
+            ],
+          ),
           /* ───────── Bottom sheet ───────── */
           Align(
             alignment: Alignment.bottomCenter,

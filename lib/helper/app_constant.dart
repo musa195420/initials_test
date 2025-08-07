@@ -2,7 +2,7 @@
 
 String constant = "";
 bool isProduction = false;
-String server_url = "https://8627-103-198-154-144.ngrok-free.app";
+String server_url = "https://97b7cccd3ab2.ngrok-free.app";
 
 enum RideStatus {
   requested,

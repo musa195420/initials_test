@@ -61,8 +61,6 @@ class LoginNotifier extends StateNotifier<LoginState> {
         _glob.setuser(user);
         if (user.roleId == 2) {
           _nav.goTo(Routes.driverhome);
-          // _nav.goTo(Routes.driver);
-          // _nav.goTo(Routes.vehicle);
         } else {
           _nav.goTo(Routes.notfound);
         }

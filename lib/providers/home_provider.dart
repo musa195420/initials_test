@@ -10,6 +10,8 @@ import '../services/dialog_service.dart';
 import '../services/global_service.dart';
 import '../services/navigation_service.dart';
 
+final nav = locator<NavigationService>();
+
 final homeProvider =
     StateNotifierProvider<HomeNotifier, HomeState>((_) => HomeNotifier());
 
@@ -19,7 +21,6 @@ class HomeNotifier extends StateNotifier<HomeState> {
   // ─── dependencies
   final _api = locator<IApiService>();
   final _dlg = locator<IDialogService>();
-  final _nav = locator<NavigationService>();
   final _glob = locator<GlobalService>();
 
   /* ───────── basic setters ───────── */
